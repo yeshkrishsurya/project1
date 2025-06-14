@@ -10,6 +10,7 @@ import requests
 from openai import OpenAI
 import logging
 from fastapi import Body
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
@@ -151,4 +152,10 @@ async def answer_question(request: QARequest = Body(None), question: str = Query
             link_text = text.split(". ")[0][:100]
             links.append({"url": url, "text": link_text})
     logger.info(f"Returning {len(links)} links with the answer.")
-    return {"answer": answer, "links": links}
+    # Add CORS headers to the response
+    response_data = {"answer": answer, "links": links}
+    return JSONResponse(content=response_data, headers={
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+        "Access-Control-Allow-Headers": "*"
+    })
