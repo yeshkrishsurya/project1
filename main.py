@@ -96,7 +96,7 @@ async def answer_question(request: QARequest = Body(None), question: str = Query
         return {"answer": f"Embedding error: {e}", "links": []}
     # Step 2: Retrieve similar contexts
     try:
-        faiss_results = retrieve_similar(query_embedding, metadatas, top_k=3)
+        faiss_results = retrieve_similar(query_embedding, metadatas, top_k=2)
         logger.info(f"Retrieved {len(faiss_results)} similar contexts from FAISS.")
     except Exception as e:
         logger.error(f"Error retrieving similar contexts: {e}")
