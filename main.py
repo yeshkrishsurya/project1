@@ -121,7 +121,7 @@ async def answer_question(request: QARequest):
             {"type": "image_url", "image_url": {"url": f"data:image/webp;base64,{request.image}"}}
         ]
     data = {
-        "model": "gpt-3.5-turbo",
+        "model": "gpt-4o-mini",
         "messages": messages,
         "max_tokens": 256,
         "temperature": 0.2
