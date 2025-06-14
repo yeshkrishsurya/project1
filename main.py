@@ -9,6 +9,7 @@ import os
 import requests
 from openai import OpenAI
 import logging
+from fastapi import Body
 
 app = FastAPI()
 
@@ -63,23 +64,25 @@ class QARequest(BaseModel):
     question: str
     image: str = None
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello, World!"}
 
-@app.get("/api")
-def get_marks(name: list[str] = Query(default=[])):
-    marks = [marks_data.get(n, 0) for n in name]
-    return {"marks": marks}
 
-@app.post("/api/")
-async def answer_question(request: QARequest):
-    logger.info(f"Received question: {request.question}")
-    if request.image:
+@app.api_route("/api/", methods=["POST", "GET"])
+@app.api_route("/", methods=["POST", "GET"])
+async def answer_question(request: QARequest = Body(None), question: str = Query(None), image: str = Query(None)):
+    # Support both POST (with JSON body) and GET (with query params)
+    if request is not None:
+        query = request.question
+        img = request.image
+    else:
+        query = question
+        img = image
+
+    logger.info(f"Received question: {query}")
+    if img:
         logger.info("Image provided with the request.")
     else:
         logger.info("No image provided.")
-    query = request.question
+
     # Step 1: Get embedding for the question
     try:
         query_embedding = openai_client.embeddings.create(
@@ -115,10 +118,10 @@ async def answer_question(request: QARequest):
         {"role": "system", "content": "You are a helpful assistant for the IITM TDS course."},
         {"role": "user", "content": grounded_prompt}
     ]
-    if request.image:
+    if img:
         messages[-1]["content"] = [
             {"type": "text", "text": grounded_prompt},
-            {"type": "image_url", "image_url": {"url": f"data:image/webp;base64,{request.image}"}}
+            {"type": "image_url", "image_url": {"url": f"data:image/webp;base64,{img}"}}
         ]
     data = {
         "model": "gpt-4o-mini",
