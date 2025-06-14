@@ -1,2 +1,2 @@
 # vercel_test
-Testing Vercel
+RAG Application project - 1
