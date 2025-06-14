@@ -1,0 +1,6 @@
+fastapi
+faiss-cpu
+openai
+requests
+pydantic
+numpy
